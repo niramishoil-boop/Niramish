@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Niramish — निरामिश | Pure by Nature</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500&family=Noto+Serif+Devanagari:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+/* ── TOKENS ─────────────────────────────── */
+:root{
+  --forest:#1c3a28;--leaf:#2d5a3d;--gold:#c8882a;--amber:#e6a93a;
+  --cream:#f7f2e8;--warm:#fdf8f0;--mist:#eae4d5;--bark:#5a3e28;
+  --white:#ffffff;--shadow:0 4px 24px rgba(28,58,40,.1);
+  --radius:6px;--transition:.25s ease;
+}
+
+/* ── RESET ──────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:'DM Sans',sans-serif;background:var(--warm);color:var(--forest);overflow-x:hidden}
+img{display:block;max-width:100%;height:auto}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;font-family:inherit;border:none;background:none}
+
+/* ── UTILITIES ──────────────────────────── */
+.en{font-family:'Cormorant Garamond',serif}
+.hi{font-family:'Noto Serif Devanagari',serif}
+.btn-primary{display:inline-block;background:var(--forest);color:var(--amber);padding:13px 28px;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;border-radius:var(--radius);transition:var(--transition);border:none;cursor:pointer}
+.btn-primary:hover{background:var(--leaf);transform:translateY(-2px)}
+.btn-outline{display:inline-block;border:1.5px solid var(--forest);color:var(--forest);padding:12px 26px;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;border-radius:var(--radius);transition:var(--transition);background:none;cursor:pointer}
+.btn-outline:hover{background:var(--forest);color:var(--amber);transform:translateY(-2px)}
+
+/* ── MARQUEE STRIP ──────────────────────── */
+.strip{background:var(--forest);color:var(--amber);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;padding:9px 0;overflow:hidden;white-space:nowrap}
+.strip-track{display:inline-block;animation:marquee 28s linear infinite}
+.strip-track span{margin:0 2rem}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* ── NAV ────────────────────────────────── */
+.nav{position:sticky;top:0;z-index:200;background:rgba(253,248,240,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--mist);height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 5vw}
+.nav-brand{display:flex;flex-direction:column;line-height:1;gap:2px}
+.nav-brand .brand-en{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:700;color:var(--forest);letter-spacing:.04em}
+.nav-brand .brand-hi{font-family:'Noto Serif Devanagari',serif;font-size:.72rem;color:var(--gold);letter-spacing:.06em}
+.nav-links{display:flex;gap:2.2rem;list-style:none}
+.nav-links a{font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--bark);transition:color var(--transition)}
+.nav-links a:hover{color:var(--forest)}
+.nav-right{display:flex;align-items:center;gap:1rem}
+.cart-btn{position:relative;background:var(--forest);color:var(--amber);width:42px;height:42px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:1.1rem;transition:var(--transition)}
+.cart-btn:hover{background:var(--leaf)}
+.cart-count{position:absolute;top:-6px;right:-6px;background:var(--gold);color:var(--white);font-size:.6rem;font-weight:700;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--warm);display:none}
+.cart-count.show{display:flex}
+.hamburger{display:none;flex-direction:column;gap:5px;padding:6px;background:none;border:none}
+.hamburger span{display:block;width:22px;height:2px;background:var(--forest);transition:var(--transition);border-radius:2px}
+.hamburger.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
+.hamburger.open span:nth-child(2){opacity:0}
+.hamburger.open span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+
+/* ── MOBILE MENU ────────────────────────── */
+.mobile-menu{position:fixed;inset:0;background:var(--warm);z-index:199;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:2.5rem;transform:translateX(100%);transition:transform .35s ease}
+.mobile-menu.open{transform:translateX(0)}
+.mobile-menu a{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:600;color:var(--forest);letter-spacing:.06em;transition:color var(--transition)}
+.mobile-menu a:hover{color:var(--gold)}
+.mobile-menu .m-hi{font-family:'Noto Serif Devanagari',serif;font-size:.9rem;color:var(--gold);display:block;text-align:center;margin-top:-.5rem}
+
+/* ── CART DRAWER ────────────────────────── */
+.cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;opacity:0;pointer-events:none;transition:opacity var(--transition)}
+.cart-overlay.open{opacity:1;pointer-events:all}
+.cart-drawer{position:fixed;top:0;right:0;height:100%;width:min(420px,100vw);background:var(--warm);z-index:301;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .35s ease;box-shadow:-8px 0 32px rgba(0,0,0,.15)}
+.cart-drawer.open{transform:translateX(0)}
+.cart-header{display:flex;justify-content:space-between;align-items:center;padding:22px 24px;border-bottom:1px solid var(--mist)}
+.cart-header h3{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600}
+.cart-close{font-size:1.5rem;color:var(--bark);background:none;border:none;cursor:pointer;line-height:1;padding:4px}
+.cart-items{flex:1;overflow-y:auto;padding:16px 24px}
+.cart-empty{text-align:center;padding:48px 0;color:var(--bark)}
+.cart-empty p{font-size:.9rem;margin-top:.5rem}
+.cart-item{display:grid;grid-template-columns:64px 1fr auto;gap:12px;align-items:start;padding:16px 0;border-bottom:1px solid var(--mist)}
+.cart-item img{width:64px;height:64px;object-fit:cover;border-radius:4px}
+.ci-name{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:600;line-height:1.2}
+.ci-size{font-size:.72rem;color:var(--bark);margin-top:2px;letter-spacing:.06em;text-transform:uppercase}
+.ci-qty{display:flex;align-items:center;gap:8px;margin-top:8px}
+.ci-qty button{width:24px;height:24px;border-radius:4px;background:var(--mist);border:none;cursor:pointer;font-size:1rem;line-height:1;display:flex;align-items:center;justify-content:center;transition:var(--transition)}
+.ci-qty button:hover{background:var(--forest);color:var(--amber)}
+.ci-qty span{font-size:.9rem;font-weight:500;min-width:20px;text-align:center}
+.ci-price{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;white-space:nowrap}
+.ci-remove{font-size:.7rem;color:#999;cursor:pointer;background:none;border:none;margin-top:4px;letter-spacing:.06em;text-transform:uppercase}
+.ci-remove:hover{color:red}
+.cart-footer{padding:20px 24px;border-top:1px solid var(--mist)}
+.cart-total{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.cart-total .label{font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;color:var(--bark)}
+.cart-total .amount{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:600}
+.cart-footer .btn-primary{width:100%;text-align:center;padding:15px;font-size:.82rem}
+.cart-note{font-size:.72rem;color:var(--bark);text-align:center;margin-top:10px}
+
+/* ── HERO ───────────────────────────────── */
+.hero{display:grid;grid-template-columns:1fr 1fr;min-height:90vh;overflow:hidden}
+.hero-left{display:flex;flex-direction:column;justify-content:center;padding:5vw 4vw 5vw 7vw}
+.hero-eyebrow{font-size:.7rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:1.2rem;display:flex;align-items:center;gap:.8rem}
+.hero-eyebrow::before{content:'';display:inline-block;width:28px;height:1px;background:var(--gold)}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2.6rem,5vw,4.8rem);font-weight:600;line-height:1.05;color:var(--forest);margin-bottom:.4rem}
+.hero-title-hi{font-family:'Noto Serif Devanagari',serif;font-size:clamp(1.1rem,2.2vw,1.9rem);color:var(--gold);font-weight:400;margin-bottom:1.6rem;line-height:1.4}
+.hero-sub{font-size:.92rem;line-height:1.85;color:var(--bark);max-width:400px;margin-bottom:2rem}
+.hero-sub .sub-hi{font-family:'Noto Serif Devanagari',serif;font-size:.85rem;color:var(--leaf);display:block;margin-top:.4rem}
+.hero-btns{display:flex;gap:.75rem;flex-wrap:wrap}
+.hero-img{overflow:hidden;position:relative}
+.hero-img img{width:100%;height:100%;object-fit:cover;object-position:center;transition:transform 7s ease}
+.hero-img:hover img{transform:scale(1.04)}
+.hero-img::before{content:'';position:absolute;left:0;top:0;bottom:0;width:30%;background:linear-gradient(90deg,var(--warm),transparent);z-index:1}
+
+/* ── TRUST BAR ──────────────────────────── */
+.trust-bar{background:var(--mist);border-top:1px solid #d5cdb8;border-bottom:1px solid #d5cdb8;display:flex;justify-content:center;flex-wrap:wrap;gap:1.5rem 3rem;padding:18px 5vw}
+.trust-item{display:flex;align-items:center;gap:.5rem;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--forest);white-space:nowrap}
+.trust-icon{font-size:1.1rem}
+
+/* ── SECTION HEADER ─────────────────────── */
+.sec-header{text-align:center;padding:72px 5vw 44px}
+.sec-eyebrow{font-size:.7rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:.9rem}
+.sec-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4vw,3.2rem);font-weight:600;color:var(--forest);line-height:1.1}
+.sec-title-hi{font-family:'Noto Serif Devanagari',serif;font-size:clamp(.9rem,1.8vw,1.3rem);color:var(--gold);font-weight:400;margin-top:4px}
+.sec-rule{width:44px;height:2px;background:linear-gradient(90deg,var(--gold),var(--amber));margin:14px auto 0;border-radius:2px}
+
+/* ── PRODUCTS ───────────────────────────── */
+#products{max-width:1400px;margin:0 auto;padding:0 5vw 80px}
+.products-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+.product-card{background:var(--cream);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);transition:box-shadow var(--transition),transform var(--transition);display:flex;flex-direction:column}
+.product-card:hover{box-shadow:0 16px 56px rgba(28,58,40,.18);transform:translateY(-4px)}
+.card-img-wrap{position:relative;height:360px;overflow:hidden;background:#f0ebe0;flex-shrink:0}
+.card-img-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .55s ease,transform .45s ease}
+.card-img-wrap .img-b{opacity:0}
+.product-card:hover .img-a{opacity:0;transform:scale(1.04)}
+.product-card:hover .img-b{opacity:1;transform:scale(1.02)}
+.card-img-wrap.single img{position:static;width:100%;height:100%;transition:transform .45s ease}
+.product-card:hover .card-img-wrap.single img{transform:scale(1.04)}
+.card-badge{position:absolute;top:14px;left:14px;z-index:2;background:var(--forest);color:var(--amber);font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;padding:5px 12px;border-radius:2px}
+.card-body{padding:22px 24px 24px;display:flex;flex-direction:column;flex:1}
+.card-tag{font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+.card-name{font-family:'Cormorant Garamond',serif;font-size:1.65rem;font-weight:600;color:var(--forest);line-height:1.1}
+.card-name-hi{font-family:'Noto Serif Devanagari',serif;font-size:.9rem;color:var(--gold);margin-bottom:12px}
+.card-desc{font-size:.83rem;line-height:1.78;color:var(--bark);margin-bottom:16px;flex:1}
+.card-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
+.pill{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--mist);color:var(--forest);padding:4px 11px;border-radius:50px;background:var(--warm)}
+.card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid var(--mist);gap:12px}
+.card-price{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:600;color:var(--forest)}
+.card-price small{font-family:'DM Sans',sans-serif;font-size:.72rem;color:var(--bark);font-weight:300;margin-left:3px}
+.add-cart{background:var(--forest);color:var(--amber);padding:10px 20px;font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;border-radius:var(--radius);border:none;cursor:pointer;transition:var(--transition);white-space:nowrap}
+.add-cart:hover{background:var(--leaf);transform:translateY(-1px)}
+.add-cart.added{background:var(--gold);color:var(--white)}
+
+/* ── WHY SECTION ────────────────────────── */
+.why{background:var(--forest);padding:80px 5vw;position:relative;overflow:hidden}
+.why::before{content:'निरामिश';font-family:'Noto Serif Devanagari',serif;position:absolute;font-size:20vw;color:rgba(255,255,255,.025);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;white-space:nowrap}
+.why-inner{max-width:1200px;margin:0 auto}
+.why .sec-eyebrow{color:var(--amber)}
+.why .sec-title{color:var(--cream)}
+.why .sec-title-hi{color:var(--amber)}
+.why .sec-rule{background:var(--amber)}
+.why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:52px}
+.why-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);padding:32px 28px;text-align:center;transition:background var(--transition)}
+.why-card:hover{background:rgba(255,255,255,.09)}
+.why-icon{font-size:2rem;margin-bottom:14px}
+.why-name{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--cream);font-weight:600;margin-bottom:4px}
+.why-name-hi{font-family:'Noto Serif Devanagari',serif;font-size:.78rem;color:var(--amber);margin-bottom:10px}
+.why-desc{font-size:.8rem;line-height:1.78;color:rgba(247,242,232,.6)}
+
+/* ── STORY ──────────────────────────────── */
+.story{display:grid;grid-template-columns:1fr 1fr}
+.story-img{overflow:hidden;min-height:460px}
+.story-img img{width:100%;height:100%;object-fit:cover;object-position:center top;transition:transform 6s ease}
+.story-img:hover img{transform:scale(1.05)}
+.story-text{background:var(--mist);display:flex;flex-direction:column;justify-content:center;padding:6vw 6vw}
+.story-eyebrow{font-size:.7rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;display:flex;align-items:center;gap:.7rem}
+.story-eyebrow::before{content:'';display:inline-block;width:24px;height:1px;background:var(--gold)}
+.story-title{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,3vw,2.6rem);font-weight:600;color:var(--forest);line-height:1.1;margin-bottom:6px}
+.story-title-hi{font-family:'Noto Serif Devanagari',serif;font-size:clamp(.85rem,1.6vw,1.1rem);color:var(--gold);margin-bottom:20px}
+.story-body{font-size:.88rem;line-height:1.85;color:var(--bark);margin-bottom:14px}
+.story-body .hi-line{font-family:'Noto Serif Devanagari',serif;font-size:.82rem;color:var(--leaf);display:block;margin-top:.4rem}
+.story-btns{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:10px}
+
+/* ── FAQ ────────────────────────────────── */
+.faq-wrap{max-width:820px;margin:0 auto;padding:0 5vw 80px}
+.faq-item{border-bottom:1px solid var(--mist);padding:20px 0}
+.faq-q{display:flex;justify-content:space-between;align-items:center;gap:1rem;cursor:pointer}
+.faq-q-text{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:var(--forest);flex:1;line-height:1.3}
+.faq-icon{font-size:1.4rem;color:var(--gold);transition:transform .3s;flex-shrink:0;line-height:1}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .4s ease,padding .3s;font-size:.85rem;line-height:1.82;color:var(--bark)}
+.faq-item.open .faq-a{max-height:300px;padding-top:12px}
+.faq-item.open .faq-icon{transform:rotate(45deg)}
+
+/* ── FOOTER ─────────────────────────────── */
+footer{background:var(--forest);color:rgba(247,242,232,.55);padding:52px 7vw 28px}
+.footer-top{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:4rem;padding-bottom:36px;border-bottom:1px solid rgba(255,255,255,.09);margin-bottom:24px}
+.foot-brand-en{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:700;color:var(--cream);line-height:1}
+.foot-brand-hi{font-family:'Noto Serif Devanagari',serif;font-size:.85rem;color:var(--amber);margin-bottom:12px}
+.foot-tagline{font-size:.8rem;line-height:1.75;max-width:270px}
+.foot-col h4{font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);margin-bottom:14px}
+.foot-col ul{list-style:none}
+.foot-col ul li{margin-bottom:8px}
+.foot-col ul li a{font-size:.82rem;color:rgba(247,242,232,.55);transition:color var(--transition)}
+.foot-col ul li a:hover{color:var(--amber)}
+.foot-contact{font-size:.8rem;line-height:1.9}
+.foot-contact a{color:rgba(247,242,232,.55);transition:color var(--transition)}
+.foot-contact a:hover{color:var(--amber)}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;font-size:.73rem;flex-wrap:wrap;gap:.5rem}
+.foot-copy-hi{font-family:'Noto Serif Devanagari',serif;color:var(--amber)}
+
+/* ── WHATSAPP BUTTON ────────────────────── */
+.wa-btn{position:fixed;bottom:28px;right:28px;z-index:250;background:#25d366;color:#fff;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.6rem;box-shadow:0 4px 20px rgba(37,211,102,.45);transition:var(--transition);text-decoration:none}
+.wa-btn:hover{background:#20bf5b;transform:scale(1.08);box-shadow:0 6px 28px rgba(37,211,102,.55)}
+.wa-tooltip{position:absolute;right:70px;background:var(--forest);color:var(--amber);padding:6px 14px;border-radius:4px;font-size:.72rem;letter-spacing:.08em;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s;top:50%;transform:translateY(-50%)}
+.wa-btn:hover .wa-tooltip{opacity:1}
+
+/* ── REVEAL ANIMATION ───────────────────── */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .65s ease,transform .65s ease}
+.reveal.visible{opacity:1;transform:none}
+
+/* ── TOAST ──────────────────────────────── */
+.toast{position:fixed;bottom:100px;right:28px;z-index:400;background:var(--forest);color:var(--amber);padding:12px 20px;border-radius:var(--radius);font-size:.82rem;letter-spacing:.06em;transform:translateX(200%);transition:transform .3s ease;box-shadow:var(--shadow)}
+.toast.show{transform:none}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE — TABLET (≤ 1024px)
+═══════════════════════════════════════════ */
+@media(max-width:1024px){
+  .hero{min-height:auto}
+  .hero-left{padding:7vw 4vw 7vw 6vw}
+  .why-grid{grid-template-columns:repeat(2,1fr)}
+  .footer-top{grid-template-columns:1fr 1fr;gap:2.5rem}
+  .footer-top>div:first-child{grid-column:1/-1}
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE — MOBILE (≤ 768px)
+═══════════════════════════════════════════ */
+@media(max-width:768px){
+  /* Nav */
+  .nav{padding:0 4vw;height:60px}
+  .nav-links{display:none}
+  .hamburger{display:flex}
+  .nav-brand .brand-en{font-size:1.35rem}
+
+  /* Hero — stacked */
+  .hero{grid-template-columns:1fr}
+  .hero-left{padding:10vw 6vw 6vw}
+  .hero-img{height:55vw;min-height:200px}
+  .hero-img::before{background:linear-gradient(180deg,transparent 60%,var(--warm) 100%);width:100%;height:50%}
+
+  /* Products — 1 col */
+  .products-grid{grid-template-columns:1fr;gap:18px}
+  .card-img-wrap{height:280px}
+
+  /* Why — 1 col */
+  .why-grid{grid-template-columns:1fr;gap:1px}
+
+  /* Story — stacked */
+  .story{grid-template-columns:1fr}
+  .story-img{min-height:52vw}
+  .story-text{padding:10vw 6vw}
+
+  /* Footer */
+  .footer-top{grid-template-columns:1fr;gap:2rem}
+  .footer-top>div:first-child{grid-column:auto}
+  .footer-bottom{flex-direction:column;align-items:flex-start;gap:.4rem}
+
+  /* WhatsApp */
+  .wa-btn{bottom:20px;right:20px;width:50px;height:50px;font-size:1.4rem}
+  .wa-tooltip{display:none}
+  .toast{right:16px;bottom:84px}
+
+  /* Misc */
+  .trust-bar{gap:1rem 2rem;justify-content:flex-start}
+  .sec-header{padding:52px 5vw 32px}
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE — SMALL PHONES (≤ 480px)
+═══════════════════════════════════════════ */
+@media(max-width:480px){
+  .hero-btns{flex-direction:column}
+  .btn-primary,.btn-outline{width:100%;text-align:center}
+  .card-body{padding:18px 18px 20px}
+  .cart-drawer{width:100vw}
+  .why{padding:60px 4vw}
+  .why-card{padding:26px 22px}
+  .faq-wrap{padding:0 4vw 60px}
+  footer{padding:44px 5vw 24px}
+  .story-btns{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<!-- STRIP -->
+<div class="strip" aria-hidden="true">
+  <div class="strip-track">
+    <span>🌿 Pure by Nature, Pure for You</span><span>· शुद्धता की पहचान ·</span>
+    <span>✦ No Additives · No Preservatives</span><span>· Cold Pressed &amp; Wood Pressed ·</span>
+    <span>🌿 100% Natural · Chemical Free</span><span>· निरामिश — Trusted Purity ·</span>
+    <span>🌿 Pure by Nature, Pure for You</span><span>· शुद्धता की पहचान ·</span>
+    <span>✦ No Additives · No Preservatives</span><span>· Cold Pressed &amp; Wood Pressed ·</span>
+    <span>🌿 100% Natural · Chemical Free</span><span>· निरामिश — Trusted Purity ·</span>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" role="navigation" aria-label="Main navigation">
+  <a href="index.html" class="nav-brand" aria-label="Niramish Home">
+    <span class="brand-en">Niramish</span>
+    <span class="brand-hi">निरामिश — विश्वसनीय शुद्धता</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#products">Products</a></li>
+    <li><a href="#why">Why Us</a></li>
+    <li><a href="#story">Our Story</a></li>
+    <li><a href="#faq">FAQ</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="cart-btn" onclick="toggleCart()" aria-label="Open cart">
+      🛒
+      <span class="cart-count" id="cartCount">0</span>
+    </button>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true">
+  <a href="#products" onclick="toggleMenu()">Products <span class="m-hi">हमारे उत्पाद</span></a>
+  <a href="#why" onclick="toggleMenu()">Why Us <span class="m-hi">क्यों निरामिश?</span></a>
+  <a href="#story" onclick="toggleMenu()">Our Story <span class="m-hi">हमारी कहानी</span></a>
+  <a href="#faq" onclick="toggleMenu()">FAQ</a>
+  <a href="checkout.html" class="btn-primary" style="margin-top:1rem">Shop Now</a>
+</div>
+
+<!-- CART OVERLAY -->
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+
+<!-- CART DRAWER -->
+<aside class="cart-drawer" id="cartDrawer" aria-label="Shopping cart">
+  <div class="cart-header">
+    <h3 class="en">Your Cart · <span style="font-family:'Noto Serif Devanagari',serif;font-size:1rem;color:var(--gold)">आपकी थाली</span></h3>
+    <button class="cart-close" onclick="toggleCart()" aria-label="Close cart">✕</button>
+  </div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-footer" id="cartFooter" style="display:none">
+    <div class="cart-total">
+      <span class="label">Total</span>
+      <span class="amount" id="cartTotal">₹0</span>
+    </div>
+    <a href="checkout.html" class="btn-primary" onclick="saveCartAndGo(event)" style="display:block;text-align:center;padding:15px">Proceed to Checkout →</a>
+    <p class="cart-note">🚚 Free delivery on orders above ₹499</p>
+  </div>
+</aside>
+
+<!-- HERO -->
+<section class="hero" aria-label="Hero">
+  <div class="hero-left">
+    <p class="hero-eyebrow">Pure by Nature</p>
+    <h1 class="hero-title en">Nature's Finest,<br/>Your Kitchen's Best.</h1>
+    <p class="hero-title-hi hi">प्रकृति का वरदान,<br/>आपके रसोई की शान।</p>
+    <p class="hero-sub">
+      Straight from the earth to your table — no chemicals, no compromise.
+      <span class="sub-hi">कोई मिलावट नहीं। कोई समझौता नहीं।</span>
+    </p>
+    <div class="hero-btns">
+      <a href="#products" class="btn-primary">Explore Products</a>
+      <a href="#story" class="btn-outline">Our Story</a>
+    </div>
+  </div>
+  <div class="hero-img">
+    <img src="img/mustard1.jpg" alt="Niramish Kachi Ghani Mustard Oil" loading="eager"/>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<div class="trust-bar" aria-label="Trust signals">
+  <div class="trust-item"><span class="trust-icon">🌱</span>100% Natural</div>
+  <div class="trust-item"><span class="trust-icon">🪵</span>Wood &amp; Cold Pressed</div>
+  <div class="trust-item"><span class="trust-icon">🚫</span>Chemical Free</div>
+  <div class="trust-item"><span class="trust-icon">🏅</span>FSSAI Certified</div>
+  <div class="trust-item"><span class="trust-icon">🇮🇳</span>Made in India</div>
+  <div class="trust-item"><span class="trust-icon">🔄</span>30-Day Guarantee</div>
+</div>
+
+<!-- PRODUCTS -->
+<section id="products" aria-labelledby="products-heading">
+  <div class="sec-header reveal">
+    <p class="sec-eyebrow">Our Products · हमारे उत्पाद</p>
+    <h2 class="sec-title en" id="products-heading">From Earth to Jar</h2>
+    <p class="sec-title-hi hi">प्रकृति से आपकी थाली तक</p>
+    <div class="sec-rule"></div>
+  </div>
+  <div id="products" class="products-grid" style="max-width:1400px;margin:0 auto;padding:0 5vw 80px" id="productsGrid">
+    <!-- Injected by JS -->
+  </div>
+</section>
+
+<!-- WHY NIRAMISH -->
+<section class="why" id="why" aria-labelledby="why-heading">
+  <div class="why-inner">
+    <div class="sec-header reveal" style="padding-top:0">
+      <p class="sec-eyebrow">Why Niramish · क्यों निरामिश?</p>
+      <h2 class="sec-title en" id="why-heading">Purity is Not a Feature.<br/>It's a Promise.</h2>
+      <p class="sec-title-hi hi">शुद्धता एक वादा है, एक विशेषता नहीं।</p>
+      <div class="sec-rule"></div>
+    </div>
+    <div class="why-grid">
+      <div class="why-card reveal"><div class="why-icon">🪵</div><p class="why-name en">Wood &amp; Cold Pressed</p><p class="why-name-hi hi">कच्ची घानी विधि</p><p class="why-desc">Extracted below 45°C on traditional wooden presses — every phytonutrient and flavour compound stays intact.</p></div>
+      <div class="why-card reveal"><div class="why-icon">🌿</div><p class="why-name en">Zero Chemicals</p><p class="why-name-hi hi">रसायन मुक्त</p><p class="why-desc">No hexane. No bleach. No deodoriser. No artificial colour. Single ingredient, nothing added, nothing removed.</p></div>
+      <div class="why-card reveal"><div class="why-icon">🏅</div><p class="why-name en">FSSAI Certified</p><p class="why-name-hi hi">सरकारी प्रमाणित</p><p class="why-desc">Every batch is third-party tested at NABL-accredited labs and carries full FSSAI certification — 12723999000615.</p></div>
+      <div class="why-card reveal"><div class="why-icon">🌾</div><p class="why-name en">Single Origin</p><p class="why-name-hi hi">एकल स्रोत</p><p class="why-desc">Mustard from Rajasthan, turmeric from Erode, groundnuts from Gujarat — regions legendary for their quality.</p></div>
+      <div class="why-card reveal"><div class="why-icon">📦</div><p class="why-name en">Pressed &amp; Packed Fresh</p><p class="why-name-hi hi">ताज़ा प्रेषण</p><p class="why-desc">We press and pack within 24–48 hours of your order. No warehoused stock sitting on shelves for months.</p></div>
+      <div class="why-card reveal"><div class="why-icon">🔄</div><p class="why-name en">30-Day Guarantee</p><p class="why-name-hi hi">30 दिन की गारंटी</p><p class="why-desc">Not satisfied for any reason? Full refund within 30 days of delivery. No questions asked. We mean it.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- STORY -->
+<section class="story" id="story" aria-labelledby="story-heading">
+  <div class="story-img">
+    <img src="img/mustard2.jpg" alt="Niramish — Pure Natural Haldi" loading="lazy"/>
+  </div>
+  <div class="story-text">
+    <p class="story-eyebrow">Our Story · हमारी कहानी</p>
+    <h2 class="story-title en" id="story-heading">Born from a Belief<br/>in Honest Food.</h2>
+    <p class="story-title-hi hi">ईमानदार खाने पर विश्वास से जन्मा।</p>
+    <p class="story-body">Niramish was founded on one simple truth — the food your grandmother cooked tasted better because the ingredients were real. No shortcuts, no substitutes, no compromise. <span class="hi-line">निरामिश की नींव एक सरल सच्चाई पर रखी गई है।</span></p>
+    <p class="story-body">We set out to bring back that purity. Every product starts with the finest raw material, processed with care, and delivered to your door the way nature intended.</p>
+    <p class="story-body" style="font-family:'Noto Serif Devanagari',serif;font-size:.88rem;color:var(--leaf)">"शुद्धता की पहचान, स्वास्थ्य की सुरक्षा।"</p>
+    <div class="story-btns">
+      <a href="#products" class="btn-primary">Shop the Range</a>
+      <a href="https://wa.me/917007939396" target="_blank" rel="noopener" class="btn-outline">Chat with Us</a>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" aria-labelledby="faq-heading">
+  <div class="sec-header reveal">
+    <p class="sec-eyebrow">FAQ · अक्सर पूछे जाने वाले प्रश्न</p>
+    <h2 class="sec-title en" id="faq-heading">Common Questions</h2>
+    <div class="sec-rule"></div>
+  </div>
+  <div class="faq-wrap">
+    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span class="faq-q-text en">What is the shelf life of your products?</span><span class="faq-icon">+</span></div><div class="faq-a">Oils: 12 months from press date. Powders: 18 months. Store in a cool, dark place away from direct sunlight. We ship fresh within 48 hours of pressing, so your product is as close to extraction date as possible.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span class="faq-q-text en">Are your oils safe for high-heat Indian cooking?</span><span class="faq-icon">+</span></div><div class="faq-a">Yes. Mustard Oil has a smoke point of ~250°C and Groundnut Oil ~230°C — both ideal for deep frying, tadka, and everyday high-heat cooking. They are stable oils that don't break down easily.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span class="faq-q-text en">क्या निरामिश उत्पाद 100% शुद्ध हैं? / Are products truly pure?</span><span class="faq-icon">+</span></div><div class="faq-a">Absolutely. Every batch is tested at NABL-accredited labs. Our products contain exactly one ingredient — what's on the label. Nothing added, nothing removed. You can request any batch's lab report by contacting us on WhatsApp.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span class="faq-q-text en">How do I use Moringa Powder daily?</span><span class="faq-icon">+</span></div><div class="faq-a">Start with ½ teaspoon per day in warm water, a smoothie, or your morning dal. Increase gradually to 1 teaspoon. It blends well into soups, chutneys, and even flatbread dough for a nutrient boost with a mild, earthy flavour.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span class="faq-q-text en">Do you offer Cash on Delivery (COD)?</span><span class="faq-icon">+</span></div><div class="faq-a">Yes! We offer UPI, Debit/Credit Card, Net Banking, and Cash on Delivery across most pin codes in India. Free delivery on orders above ₹499. Delivery typically takes 3–5 working days.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span class="faq-q-text en">What is your return &amp; refund policy?</span><span class="faq-icon">+</span></div><div class="faq-a">Every Niramish product has a 30-day satisfaction guarantee. If you're not completely happy for any reason — quality, freshness, or otherwise — contact us and we will arrange a full refund. No hoops, no hassle.</div></div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer role="contentinfo">
+  <div class="footer-top">
+    <div>
+      <div class="foot-brand-en en">Niramish</div>
+      <div class="foot-brand-hi hi">निरामिश — विश्वसनीय शुद्धता</div>
+      <p class="foot-tagline">Pure by Nature, Pure for You. Bringing honest, chemical-free food ingredients straight from the source to your kitchen since day one.</p>
+    </div>
+    <div class="foot-col">
+      <h4>Products</h4>
+      <ul>
+        <li><a href="#products">Mustard Oil · सरसों तेल</a></li>
+        <li><a href="#products">Pure Haldi · हल्दी</a></li>
+        <li><a href="#products">Groundnut Oil · मूंगफली तेल</a></li>
+        <li><a href="#products">Moringa Powder · मोरिंगा</a></li>
+      </ul>
+    </div>
+    <div class="foot-col">
+      <h4>Contact</h4>
+      <div class="foot-contact">
+        <a href="https://wa.me/917007939396" target="_blank" rel="noopener">📱 +91 70079 39396</a><br/>
+        <a href="mailto:info@niramish.com">✉️ info@niramish.com</a><br/>
+        <span style="font-size:.75rem;margin-top:6px;display:block">Vill. Barhalganj, Gorakhpur<br/>Uttar Pradesh — 273402</span>
+        <a href="https://wa.me/917007939396" target="_blank" rel="noopener" style="display:inline-block;margin-top:10px;background:#25d366;color:#fff;padding:7px 16px;border-radius:4px;font-size:.75rem;letter-spacing:.08em">💬 WhatsApp Us</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 Niramish Naturals Pvt. Ltd. · FSSAI Lic. 12723999000615</span>
+    <span class="foot-copy-hi hi">शुद्धता की पहचान, स्वास्थ्य की सुरक्षा 🌿</span>
+  </div>
+</footer>
+
+<!-- WHATSAPP -->
+<a class="wa-btn" href="https://wa.me/917007939396?text=Hello%20Niramish!%20I%20have%20a%20query%20about%20your%20products." target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+  <span class="wa-tooltip">Chat on WhatsApp</span>
+  <svg width="28" height="28" viewBox="0 0 32 32" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M16 2C8.28 2 2 8.28 2 16c0 2.48.67 4.8 1.83 6.8L2 30l7.42-1.8A13.93 13.93 0 0016 30c7.72 0 14-6.28 14-14S23.72 2 16 2zm7.06 19.6c-.3.84-1.74 1.6-2.4 1.7-.62.1-1.4.14-2.25-.14-.52-.17-1.18-.4-2.03-.78-3.56-1.54-5.88-5.14-6.06-5.38-.18-.24-1.46-1.94-1.46-3.7 0-1.76.92-2.62 1.25-2.98.3-.34.66-.42.88-.42.22 0 .44 0 .64.01.2.01.48-.08.74.56.3.7 1 2.44 1.08 2.62.1.18.16.4.04.64-.12.24-.18.38-.36.58-.18.2-.38.44-.54.6-.18.18-.36.38-.16.74.2.36.9 1.48 1.94 2.4 1.34 1.18 2.46 1.54 2.82 1.72.36.18.56.16.76-.1.2-.26.88-1.02 1.12-1.38.24-.36.48-.3.8-.18.34.12 2.12 1 2.48 1.18.36.18.6.26.7.4.1.14.1.8-.2 1.64z"/></svg>
+</a>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ─── PRODUCT DATA ─── */
+const PRODUCTS = [
+  {
+    id:'mustard-oil',name:'Mustard Oil',hindi:'सरसों का शुद्ध तेल',
+    tag:'Wood Pressed · Kachi Ghani',badge:'Bestseller',
+    price:429,size:'1 Litre',
+    desc:'Cold-pressed from handpicked black mustard seeds, retaining every drop of bold aroma and natural nutrients. No heat, no hexane — just pure golden goodness.',
+    pills:['Rich Aroma','High Smoke Point','Omega-3 Rich','No Additives'],
+    img:'img/mustard1.jpg',imgBack:'img/mustard2.jpg'
+  },
+  {
+    id:'haldi',name:'Pure Haldi',hindi:'शुद्ध हल्दी पाउडर',
+    tag:'Sun-Dried · Stone Ground',badge:'100% Curcumin',
+    price:199,size:'200g',
+    desc:'Sun-dried turmeric roots, carefully selected and stone-ground to preserve natural golden colour, pungent aroma, and 2.5–5% curcumin content.',
+    pills:['Anti-inflammatory','2.5–5% Curcumin','No Preservatives','No Colour'],
+    img:'img/haldi1.jpg',imgBack:'img/haldi2.jpg'
+  },
+  {
+    id:'groundnut-oil',name:'Groundnut Oil',hindi:'मूंगफली का तेल',
+    tag:'Wood Pressed · Single Origin',badge:'Cold Pressed',
+    price:349,size:'500ml',
+    desc:'Pressed slowly from premium Gujarat groundnuts — light, nutty, and rich in Vitamin E. Perfect for everyday frying, sautéing, and Indian cooking.',
+    pills:['Vitamin E Rich','Heart Friendly','Light Flavour','500ml'],
+    img:'img/groundnut.jpg',imgBack:null
+  },
+  {
+    id:'moringa',name:'Moringa Powder',hindi:'मोरिंगा पाउडर',
+    tag:'Plant Based · Chemical Free',badge:'Superfood',
+    price:249,size:'100g',
+    desc:'Pure Moringa Oleifera leaf powder, carefully dried and milled. Packed with antioxidants, iron, and vitamins. Add to smoothies, dals, or warm water daily.',
+    pills:['Immunity Booster','Nutrient Dense','Natural Detox','100g'],
+    img:'img/moringa.jpg',imgBack:null
+  }
+];
+
+/* ─── CART ─── */
+let cart = JSON.parse(sessionStorage.getItem('niramish_cart')||'[]');
+
+function saveCart(){sessionStorage.setItem('niramish_cart',JSON.stringify(cart))}
+
+function getCartItem(id){return cart.find(i=>i.id===id)}
+
+function addToCart(id){
+  const p = PRODUCTS.find(p=>p.id===id);
+  if(!p)return;
+  const item = getCartItem(id);
+  if(item){item.qty++}else{cart.push({...p,qty:1})}
+  saveCart();
+  updateCartUI();
+  showToast(`${p.name} added to cart 🛒`);
+  const btn = document.querySelector(`[data-id="${id}"]`);
+  if(btn){btn.textContent='✓ Added';btn.classList.add('added');setTimeout(()=>{btn.textContent='Add to Cart';btn.classList.remove('added')},1600)}
+}
+
+function changeQty(id,delta){
+  const item = getCartItem(id);
+  if(!item)return;
+  item.qty += delta;
+  if(item.qty<=0)cart=cart.filter(i=>i.id!==id);
+  saveCart();renderCartItems();updateCartCount();
+}
+
+function updateCartUI(){renderCartItems();updateCartCount()}
+
+function updateCartCount(){
+  const total = cart.reduce((s,i)=>s+i.qty,0);
+  const el = document.getElementById('cartCount');
+  el.textContent=total;
+  el.classList.toggle('show',total>0);
+}
+
+function renderCartItems(){
+  const el=document.getElementById('cartItems');
+  const footer=document.getElementById('cartFooter');
+  if(!cart.length){
+    el.innerHTML=`<div class="cart-empty"><div style="font-size:2.5rem">🛒</div><p>Your cart is empty.</p><p style="margin-top:.25rem;font-family:'Noto Serif Devanagari',sans-serif;font-size:.8rem;color:var(--gold)">आपकी थाली खाली है।</p></div>`;
+    footer.style.display='none';return;
+  }
+  el.innerHTML=cart.map(i=>`
+    <div class="cart-item">
+      <img src="${i.img}" alt="${i.name}"/>
+      <div>
+        <div class="ci-name">${i.name}</div>
+        <div class="ci-size">${i.size}</div>
+        <div class="ci-qty">
+          <button onclick="changeQty('${i.id}',-1)" aria-label="Decrease">−</button>
+          <span>${i.qty}</span>
+          <button onclick="changeQty('${i.id}',1)" aria-label="Increase">+</button>
+        </div>
+        <button class="ci-remove" onclick="changeQty('${i.id}',-${i.qty})">Remove</button>
+      </div>
+      <div class="ci-price">₹${i.price*i.qty}</div>
+    </div>`).join('');
+  const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  document.getElementById('cartTotal').textContent=`₹${total}`;
+  footer.style.display='block';
+}
+
+function saveCartAndGo(e){saveCart()}
+
+/* ─── CART DRAWER ─── */
+let cartOpen=false;
+function toggleCart(){
+  cartOpen=!cartOpen;
+  document.getElementById('cartDrawer').classList.toggle('open',cartOpen);
+  document.getElementById('cartOverlay').classList.toggle('open',cartOpen);
+  document.body.style.overflow=cartOpen?'hidden':'';
+  if(cartOpen)renderCartItems();
+}
+
+/* ─── MOBILE MENU ─── */
+let menuOpen=false;
+function toggleMenu(){
+  menuOpen=!menuOpen;
+  document.getElementById('mobileMenu').classList.toggle('open',menuOpen);
+  document.getElementById('hamburger').classList.toggle('open',menuOpen);
+  document.body.style.overflow=menuOpen?'hidden':'';
+}
+
+/* ─── FAQ ─── */
+function toggleFaq(el){
+  const item=el.closest('.faq-item');
+  const open=item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
+  if(!open)item.classList.add('open');
+}
+
+/* ─── TOAST ─── */
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+/* ─── RENDER PRODUCTS ─── */
+function renderProducts(){
+  const grid = document.getElementById('productsGrid');
+  grid.innerHTML = PRODUCTS.map(p=>`
+    <article class="product-card reveal" aria-label="${p.name}">
+      <div class="card-badge">${p.badge}</div>
+      <div class="card-img-wrap${p.imgBack?'':' single'}">
+        ${p.imgBack
+          ?`<img class="img-a" src="${p.img}" alt="${p.name}" loading="lazy"/>
+             <img class="img-b" src="${p.imgBack}" alt="${p.name} back" loading="lazy"/>`
+          :`<img src="${p.img}" alt="${p.name}" loading="lazy"/>`
+        }
+      </div>
+      <div class="card-body">
+        <p class="card-tag">${p.tag}</p>
+        <h3 class="card-name en">${p.name}</h3>
+        <p class="card-name-hi hi">${p.hindi}</p>
+        <p class="card-desc">${p.desc}</p>
+        <div class="card-pills">${p.pills.map(pl=>`<span class="pill">${pl}</span>`).join('')}</div>
+        <div class="card-footer">
+          <div class="card-price en">₹${p.price}<small>/ ${p.size}</small></div>
+          <button class="add-cart" data-id="${p.id}" onclick="addToCart('${p.id}')">Add to Cart</button>
+        </div>
+      </div>
+    </article>`).join('');
+  observeReveal();
+}
+
+/* ─── SCROLL REVEAL ─── */
+function observeReveal(){
+  const io=new IntersectionObserver((entries)=>{
+    entries.forEach((e,i)=>{
+      if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'),i*80);io.unobserve(e.target)}
+    });
+  },{threshold:.1});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+}
+
+/* ─── INIT ─── */
+renderProducts();
+updateCartCount();
+observeReveal();
+</script>
+</body>
+</html>

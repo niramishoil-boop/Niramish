@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Checkout · Niramish — निरामिश</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500&family=Noto+Serif+Devanagari:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --forest:#1c3a28;--leaf:#2d5a3d;--gold:#c8882a;--amber:#e6a93a;
+  --cream:#f7f2e8;--warm:#fdf8f0;--mist:#eae4d5;--bark:#5a3e28;
+  --white:#ffffff;--red:#c0392b;--green:#27ae60;
+  --shadow:0 2px 16px rgba(28,58,40,.09);--radius:8px;--transition:.22s ease;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--warm);color:var(--forest);min-height:100vh}
+img{display:block;max-width:100%}
+a{text-decoration:none;color:inherit}
+
+/* NAV */
+.nav{background:rgba(253,248,240,.97);backdrop-filter:blur(14px);border-bottom:1px solid var(--mist);height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 5vw;position:sticky;top:0;z-index:100}
+.nav-brand{display:flex;flex-direction:column;line-height:1;gap:2px}
+.brand-en{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;color:var(--forest)}
+.brand-hi{font-family:'Noto Serif Devanagari',serif;font-size:.7rem;color:var(--gold)}
+.nav-back{display:flex;align-items:center;gap:.5rem;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--bark);transition:color var(--transition)}
+.nav-back:hover{color:var(--forest)}
+.nav-steps{display:flex;align-items:center;gap:.5rem;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase}
+.step{color:var(--bark);padding:6px 14px;border-radius:4px}
+.step.active{background:var(--forest);color:var(--amber)}
+.step.done{color:var(--gold)}
+
+/* LAYOUT */
+.checkout-layout{display:grid;grid-template-columns:1fr 400px;gap:32px;max-width:1140px;margin:36px auto 60px;padding:0 5vw;align-items:start}
+.checkout-form{display:flex;flex-direction:column;gap:28px}
+.order-summary{position:sticky;top:88px}
+
+/* CARDS */
+.card{background:var(--cream);border-radius:var(--radius);border:1px solid var(--mist);padding:28px 26px;box-shadow:var(--shadow)}
+.card-title{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:600;color:var(--forest);margin-bottom:4px}
+.card-title-hi{font-family:'Noto Serif Devanagari',serif;font-size:.78rem;color:var(--gold);margin-bottom:20px}
+
+/* FORM */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group.full{grid-column:1/-1}
+label{font-size:.73rem;letter-spacing:.1em;text-transform:uppercase;color:var(--bark)}
+input,select,textarea{width:100%;padding:11px 14px;border:1.5px solid var(--mist);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:.88rem;background:var(--warm);color:var(--forest);outline:none;transition:border-color var(--transition)}
+input:focus,select:focus,textarea:focus{border-color:var(--gold)}
+input::placeholder{color:#bbb}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235a3e28' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+textarea{resize:vertical;min-height:72px}
+.form-group.error input,.form-group.error select{border-color:var(--red)}
+.form-err{font-size:.7rem;color:var(--red);margin-top:2px;display:none}
+.form-group.error .form-err{display:block}
+
+/* PAYMENT */
+.pay-methods{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.pay-opt{display:flex;align-items:center;gap:12px;padding:14px 16px;border:1.5px solid var(--mist);border-radius:8px;cursor:pointer;transition:border-color var(--transition),background var(--transition)}
+.pay-opt:hover{border-color:var(--gold);background:rgba(200,136,42,.04)}
+.pay-opt.selected{border-color:var(--forest);background:rgba(28,58,40,.05)}
+.pay-opt input[type=radio]{accent-color:var(--forest);width:16px;height:16px;flex-shrink:0}
+.pay-label{display:flex;flex-direction:column;gap:2px;flex:1}
+.pay-name{font-size:.88rem;font-weight:500}
+.pay-sub{font-size:.72rem;color:var(--bark)}
+.pay-icon{font-size:1.4rem}
+
+/* UPI PANEL */
+.pay-panel{display:none;padding:16px;background:var(--warm);border-radius:6px;margin-top:-4px;border:1px solid var(--mist);border-top:none;animation:slideDown .25s ease}
+.pay-panel.active{display:block}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+.upi-id-box{background:var(--mist);border-radius:6px;padding:10px 14px;font-size:.85rem;font-family:monospace;letter-spacing:.06em;color:var(--forest);display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.copy-btn{font-size:.7rem;background:var(--forest);color:var(--amber);border:none;padding:4px 10px;border-radius:4px;cursor:pointer;letter-spacing:.08em}
+.copy-btn:hover{background:var(--leaf)}
+.card-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+
+/* ORDER SUMMARY */
+.summary-items{display:flex;flex-direction:column;gap:12px;margin-bottom:18px}
+.s-item{display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center}
+.s-item img{width:52px;height:52px;object-fit:cover;border-radius:4px}
+.s-item-name{font-size:.85rem;font-weight:500;line-height:1.2}
+.s-item-sub{font-size:.7rem;color:var(--bark);margin-top:1px}
+.s-item-price{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:600;white-space:nowrap}
+.divider{border:none;border-top:1px solid var(--mist);margin:14px 0}
+.line-item{display:flex;justify-content:space-between;align-items:center;font-size:.84rem;margin-bottom:8px}
+.line-item.total{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;border-top:1.5px solid var(--mist);padding-top:12px;margin-top:4px}
+.line-item .lbl{color:var(--bark)}
+.line-item.total .lbl{color:var(--forest)}
+.free-del{color:var(--green);font-weight:500}
+.coupon-row{display:flex;gap:8px;margin:16px 0}
+.coupon-row input{flex:1}
+.coupon-btn{background:var(--forest);color:var(--amber);border:none;padding:0 18px;border-radius:6px;font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:var(--transition)}
+.coupon-btn:hover{background:var(--leaf)}
+.coupon-msg{font-size:.72rem;margin-top:-8px;margin-bottom:8px}
+.coupon-msg.ok{color:var(--green)}
+.coupon-msg.err{color:var(--red)}
+
+/* PLACE ORDER */
+.place-btn{width:100%;background:var(--forest);color:var(--amber);border:none;padding:16px;font-size:.85rem;letter-spacing:.14em;text-transform:uppercase;border-radius:var(--radius);cursor:pointer;transition:var(--transition);font-family:'DM Sans',sans-serif;margin-top:6px}
+.place-btn:hover{background:var(--leaf);transform:translateY(-1px)}
+.place-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.secure-note{font-size:.7rem;color:var(--bark);text-align:center;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:.3rem}
+.wa-support{display:flex;align-items:center;gap:.5rem;font-size:.75rem;color:var(--bark);margin-top:12px;padding-top:12px;border-top:1px solid var(--mist)}
+.wa-support a{color:#25d366;font-weight:500}
+
+/* SUCCESS SCREEN */
+.success-screen{display:none;text-align:center;padding:60px 24px;max-width:520px;margin:0 auto}
+.success-screen.show{display:block}
+.success-icon{font-size:4rem;margin-bottom:1rem}
+.success-title{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:600;color:var(--forest);margin-bottom:.5rem}
+.success-title-hi{font-family:'Noto Serif Devanagari',serif;font-size:1.1rem;color:var(--gold);margin-bottom:1.2rem}
+.success-body{font-size:.9rem;line-height:1.8;color:var(--bark);margin-bottom:2rem}
+.success-body a{color:var(--gold)}
+
+/* WHATSAPP */
+.wa-float{position:fixed;bottom:24px;right:24px;z-index:200;background:#25d366;color:#fff;width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 4px 18px rgba(37,211,102,.4);transition:var(--transition)}
+.wa-float:hover{background:#20bf5b;transform:scale(1.08)}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .checkout-layout{grid-template-columns:1fr;gap:20px}
+  .order-summary{position:static;order:-1}
+  .nav-steps{display:none}
+}
+@media(max-width:600px){
+  .form-row{grid-template-columns:1fr}
+  .card{padding:20px 16px}
+  .card-row{grid-template-columns:1fr 1fr}
+  .checkout-layout{padding:0 4vw;margin:20px auto 48px}
+}
+@media(max-width:420px){
+  .card-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="index.html" class="nav-brand">
+    <span class="brand-en">Niramish</span>
+    <span class="brand-hi">निरामिश</span>
+  </a>
+  <div class="nav-steps">
+    <span class="step done">Cart ✓</span>
+    <span style="color:var(--mist)">›</span>
+    <span class="step active">Details</span>
+    <span style="color:var(--mist)">›</span>
+    <span class="step">Payment</span>
+    <span style="color:var(--mist)">›</span>
+    <span class="step">Confirm</span>
+  </div>
+  <a href="index.html" class="nav-back">← Back to Shop</a>
+</nav>
+
+<!-- SUCCESS SCREEN (hidden until order placed) -->
+<div class="success-screen" id="successScreen">
+  <div class="success-icon">🎉</div>
+  <h1 class="success-title">Order Confirmed!</h1>
+  <p class="success-title-hi" style="font-family:'Noto Serif Devanagari',serif">आपका ऑर्डर मिल गया! धन्यवाद।</p>
+  <p class="success-body">
+    Thank you for choosing Niramish. Your order has been placed and we'll dispatch it within 24–48 hours.<br/>
+    You'll receive a WhatsApp confirmation shortly on your registered number.<br/><br/>
+    Questions? <a href="https://wa.me/917007939396" target="_blank" rel="noopener">Chat with us on WhatsApp</a>
+  </p>
+  <a href="index.html" style="display:inline-block;background:var(--forest);color:var(--amber);padding:14px 32px;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;border-radius:6px">← Continue Shopping</a>
+</div>
+
+<!-- CHECKOUT LAYOUT -->
+<div class="checkout-layout" id="checkoutLayout">
+
+  <!-- LEFT: FORM -->
+  <div class="checkout-form">
+
+    <!-- DELIVERY DETAILS -->
+    <div class="card">
+      <div class="card-title">Delivery Details</div>
+      <div class="card-title-hi" style="font-family:'Noto Serif Devanagari',serif">डिलीवरी की जानकारी</div>
+      <div class="form-row" id="deliveryForm">
+        <div class="form-group">
+          <label>First Name *</label>
+          <input type="text" id="fname" placeholder="Rajesh"/>
+          <span class="form-err">Required</span>
+        </div>
+        <div class="form-group">
+          <label>Last Name *</label>
+          <input type="text" id="lname" placeholder="Kumar"/>
+          <span class="form-err">Required</span>
+        </div>
+        <div class="form-group">
+          <label>Phone Number *</label>
+          <input type="tel" id="phone" placeholder="+91 98765 43210" maxlength="15"/>
+          <span class="form-err">Enter valid phone</span>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="email" placeholder="rajesh@email.com"/>
+        </div>
+        <div class="form-group full">
+          <label>Address Line 1 *</label>
+          <input type="text" id="addr1" placeholder="House No., Street Name"/>
+          <span class="form-err">Required</span>
+        </div>
+        <div class="form-group full">
+          <label>Address Line 2</label>
+          <input type="text" id="addr2" placeholder="Landmark, Colony (optional)"/>
+        </div>
+        <div class="form-group">
+          <label>City *</label>
+          <input type="text" id="city" placeholder="Gorakhpur"/>
+          <span class="form-err">Required</span>
+        </div>
+        <div class="form-group">
+          <label>State *</label>
+          <select id="state">
+            <option value="">Select State</option>
+            <option>Uttar Pradesh</option><option>Bihar</option><option>Maharashtra</option>
+            <option>Delhi</option><option>Rajasthan</option><option>Gujarat</option>
+            <option>Madhya Pradesh</option><option>West Bengal</option><option>Karnataka</option>
+            <option>Tamil Nadu</option><option>Andhra Pradesh</option><option>Telangana</option>
+            <option>Punjab</option><option>Haryana</option><option>Jharkhand</option>
+            <option>Uttarakhand</option><option>Himachal Pradesh</option><option>Other</option>
+          </select>
+          <span class="form-err">Select a state</span>
+        </div>
+        <div class="form-group">
+          <label>PIN Code *</label>
+          <input type="text" id="pin" placeholder="273402" maxlength="6"/>
+          <span class="form-err">Enter 6-digit PIN</span>
+        </div>
+        <div class="form-group full">
+          <label>Delivery Instructions <span style="font-weight:300;color:var(--bark)">(optional)</span></label>
+          <textarea id="notes" placeholder="Leave at door, call before delivery…"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAYMENT METHOD -->
+    <div class="card">
+      <div class="card-title">Payment Method</div>
+      <div class="card-title-hi" style="font-family:'Noto Serif Devanagari',serif">भुगतान का तरीका</div>
+      <div class="pay-methods">
+
+        <!-- UPI -->
+        <div class="pay-opt selected" id="opt-upi" onclick="selectPay('upi')">
+          <input type="radio" name="payMethod" value="upi" checked/> 
+          <div class="pay-label"><span class="pay-name">UPI / QR Code</span><span class="pay-sub">PhonePe, GPay, Paytm, BHIM</span></div>
+          <span class="pay-icon">📱</span>
+        </div>
+        <div class="pay-panel active" id="panel-upi">
+          <p style="font-size:.78rem;color:var(--bark);margin-bottom:10px">Pay directly to our UPI ID:</p>
+          <div class="upi-id-box">
+            <span>niramish@upi</span>
+            <button class="copy-btn" onclick="copyUPI()">Copy</button>
+          </div>
+          <div class="form-group">
+            <label>Enter your UPI Transaction ID</label>
+            <input type="text" id="upiTxn" placeholder="e.g. 123456789012"/>
+          </div>
+        </div>
+
+        <!-- CARD -->
+        <div class="pay-opt" id="opt-card" onclick="selectPay('card')">
+          <input type="radio" name="payMethod" value="card"/>
+          <div class="pay-label"><span class="pay-name">Credit / Debit Card</span><span class="pay-sub">Visa, Mastercard, RuPay</span></div>
+          <span class="pay-icon">💳</span>
+        </div>
+        <div class="pay-panel" id="panel-card">
+          <div class="form-group" style="margin-bottom:12px">
+            <label>Card Number</label>
+            <input type="text" id="cardNum" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCard(this)"/>
+          </div>
+          <div class="card-row">
+            <div class="form-group">
+              <label>Name on Card</label>
+              <input type="text" id="cardName" placeholder="Rajesh Kumar"/>
+            </div>
+            <div class="form-group">
+              <label>Expiry</label>
+              <input type="text" id="cardExp" placeholder="MM/YY" maxlength="5" oninput="formatExpiry(this)"/>
+            </div>
+            <div class="form-group">
+              <label>CVV</label>
+              <input type="password" id="cardCvv" placeholder="•••" maxlength="3"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- NET BANKING -->
+        <div class="pay-opt" id="opt-net" onclick="selectPay('net')">
+          <input type="radio" name="payMethod" value="net"/>
+          <div class="pay-label"><span class="pay-name">Net Banking</span><span class="pay-sub">All major banks supported</span></div>
+          <span class="pay-icon">🏦</span>
+        </div>
+        <div class="pay-panel" id="panel-net">
+          <div class="form-group">
+            <label>Select Bank</label>
+            <select id="bank">
+              <option value="">Choose your bank</option>
+              <option>State Bank of India</option><option>HDFC Bank</option><option>ICICI Bank</option>
+              <option>Axis Bank</option><option>Bank of Baroda</option><option>Punjab National Bank</option>
+              <option>Kotak Mahindra Bank</option><option>Union Bank</option><option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- COD -->
+        <div class="pay-opt" id="opt-cod" onclick="selectPay('cod')">
+          <input type="radio" name="payMethod" value="cod"/>
+          <div class="pay-label"><span class="pay-name">Cash on Delivery</span><span class="pay-sub">Pay when you receive your order · ₹30 COD fee applies</span></div>
+          <span class="pay-icon">💵</span>
+        </div>
+        <div class="pay-panel" id="panel-cod">
+          <p style="font-size:.8rem;line-height:1.7;color:var(--bark)">Keep ₹<span id="codTotal">0</span> + ₹30 (COD fee) ready at delivery. Our delivery partner will collect payment at your doorstep.<br/><span style="font-family:'Noto Serif Devanagari',serif;font-size:.75rem;color:var(--gold)">डिलीवरी पर भुगतान करें।</span></p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: ORDER SUMMARY -->
+  <aside class="order-summary">
+    <div class="card">
+      <div class="card-title">Order Summary</div>
+      <div class="card-title-hi" style="font-family:'Noto Serif Devanagari',serif;margin-bottom:16px">आपका ऑर्डर</div>
+      <div class="summary-items" id="summaryItems">
+        <p style="font-size:.85rem;color:var(--bark)">Your cart is empty. <a href="index.html" style="color:var(--gold)">← Shop now</a></p>
+      </div>
+      <hr class="divider"/>
+      <div class="coupon-row">
+        <input type="text" id="couponInput" placeholder="Coupon code"/>
+        <button class="coupon-btn" onclick="applyCoupon()">Apply</button>
+      </div>
+      <p class="coupon-msg" id="couponMsg"></p>
+      <div class="line-item"><span class="lbl">Subtotal</span><span id="subTotal">₹0</span></div>
+      <div class="line-item"><span class="lbl">Discount</span><span id="discLine" style="color:var(--green)">—</span></div>
+      <div class="line-item"><span class="lbl">Delivery</span><span id="delivLine">₹0</span></div>
+      <div class="line-item"><span class="lbl">COD Fee</span><span id="codFeeRow" style="display:none">₹30</span></div>
+      <div class="line-item total"><span class="lbl">Total</span><span id="grandTotal">₹0</span></div>
+      <button class="place-btn" id="placeBtn" onclick="placeOrder()">Place Order →</button>
+      <p class="secure-note">🔒 Secure checkout · SSL Encrypted</p>
+      <div class="wa-support">
+        <svg width="16" height="16" viewBox="0 0 32 32" fill="#25d366"><path d="M16 2C8.28 2 2 8.28 2 16c0 2.48.67 4.8 1.83 6.8L2 30l7.42-1.8A13.93 13.93 0 0016 30c7.72 0 14-6.28 14-14S23.72 2 16 2z"/></svg>
+        <span>Need help? <a href="https://wa.me/917007939396" target="_blank" rel="noopener">Chat on WhatsApp</a></span>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- WHATSAPP FLOAT -->
+<a class="wa-float" href="https://wa.me/917007939396?text=Hi%20Niramish!%20I%20need%20help%20with%20my%20order." target="_blank" rel="noopener" aria-label="WhatsApp support">
+  <svg width="26" height="26" viewBox="0 0 32 32" fill="white"><path d="M16 2C8.28 2 2 8.28 2 16c0 2.48.67 4.8 1.83 6.8L2 30l7.42-1.8A13.93 13.93 0 0016 30c7.72 0 14-6.28 14-14S23.72 2 16 2zm7.06 19.6c-.3.84-1.74 1.6-2.4 1.7-.62.1-1.4.14-2.25-.14-.52-.17-1.18-.4-2.03-.78-3.56-1.54-5.88-5.14-6.06-5.38-.18-.24-1.46-1.94-1.46-3.7 0-1.76.92-2.62 1.25-2.98.3-.34.66-.42.88-.42.22 0 .44 0 .64.01.2.01.48-.08.74.56.3.7 1 2.44 1.08 2.62.1.18.16.4.04.64-.12.24-.18.38-.36.58-.18.2-.38.44-.54.6-.18.18-.36.38-.16.74.2.36.9 1.48 1.94 2.4 1.34 1.18 2.46 1.54 2.82 1.72.36.18.56.16.76-.1.2-.26.88-1.02 1.12-1.38.24-.36.48-.3.8-.18.34.12 2.12 1 2.48 1.18.36.18.6.26.7.4.1.14.1.8-.2 1.64z"/></svg>
+</a>
+
+<script>
+/* ─── CART ─── */
+const cart = JSON.parse(sessionStorage.getItem('niramish_cart')||'[]');
+let discount = 0;
+let selectedPay = 'upi';
+
+/* ─── RENDER SUMMARY ─── */
+function renderSummary(){
+  const el = document.getElementById('summaryItems');
+  if(!cart.length){
+    el.innerHTML='<p style="font-size:.85rem;color:var(--bark)">Your cart is empty. <a href="index.html" style="color:var(--gold)">← Shop now</a></p>';
+    updateTotals();return;
+  }
+  el.innerHTML = cart.map(i=>`
+    <div class="s-item">
+      <img src="${i.img}" alt="${i.name}"/>
+      <div>
+        <div class="s-item-name">${i.name}</div>
+        <div class="s-item-sub">${i.size} × ${i.qty}</div>
+      </div>
+      <div class="s-item-price">₹${i.price * i.qty}</div>
+    </div>`).join('');
+  updateTotals();
+}
+
+function getSubtotal(){return cart.reduce((s,i)=>s+i.price*i.qty,0)}
+
+function updateTotals(){
+  const sub = getSubtotal();
+  const delivery = sub >= 499 ? 0 : 49;
+  const codFee = selectedPay==='cod' ? 30 : 0;
+  const grand = sub - discount + delivery + codFee;
+  document.getElementById('subTotal').textContent = `₹${sub}`;
+  document.getElementById('discLine').textContent = discount ? `-₹${discount}` : '—';
+  document.getElementById('delivLine').innerHTML = delivery===0 ? '<span class="free-del">FREE 🎉</span>' : `₹${delivery}`;
+  const codRow = document.getElementById('codFeeRow');
+  codRow.style.display = codFee ? 'inline' : 'none';
+  document.getElementById('grandTotal').textContent = `₹${grand}`;
+  document.getElementById('codTotal').textContent = sub - discount + delivery;
+}
+
+/* ─── COUPON ─── */
+const COUPONS = {'NIRAMISH10':{pct:10,label:'10% off'},'FIRST15':{pct:15,label:'15% off - First Order'},'NATURE20':{pct:20,label:'20% off'}};
+function applyCoupon(){
+  const code = document.getElementById('couponInput').value.trim().toUpperCase();
+  const msg = document.getElementById('couponMsg');
+  if(!code){msg.textContent='Enter a coupon code';msg.className='coupon-msg err';return}
+  if(COUPONS[code]){
+    const c=COUPONS[code];
+    discount = Math.round(getSubtotal()*c.pct/100);
+    msg.textContent=`✓ ${c.label} applied! You save ₹${discount}`;msg.className='coupon-msg ok';
+    updateTotals();
+  }else{
+    discount=0;msg.textContent='Invalid coupon code';msg.className='coupon-msg err';updateTotals();
+  }
+}
+
+/* ─── PAYMENT ─── */
+function selectPay(method){
+  selectedPay=method;
+  ['upi','card','net','cod'].forEach(m=>{
+    document.getElementById(`opt-${m}`).classList.toggle('selected',m===method);
+    document.getElementById(`panel-${m}`).classList.toggle('active',m===method);
+    document.querySelector(`#opt-${m} input`).checked=(m===method);
+  });
+  updateTotals();
+}
+
+function copyUPI(){
+  navigator.clipboard?.writeText('niramish@upi').then(()=>{
+    const btn=document.querySelector('.copy-btn');btn.textContent='Copied!';
+    setTimeout(()=>btn.textContent='Copy',1800);
+  });
+}
+
+function formatCard(input){
+  let v=input.value.replace(/\D/g,'').substring(0,16);
+  input.value=v.replace(/(.{4})/g,'$1 ').trim();
+}
+
+function formatExpiry(input){
+  let v=input.value.replace(/\D/g,'');
+  if(v.length>=3)v=v.substring(0,2)+'/'+v.substring(2,4);
+  input.value=v;
+}
+
+/* ─── VALIDATION ─── */
+function validate(){
+  const fields=[
+    {id:'fname',test:v=>v.trim().length>0},
+    {id:'lname',test:v=>v.trim().length>0},
+    {id:'phone',test:v=>/^[+\d\s]{8,15}$/.test(v)},
+    {id:'addr1',test:v=>v.trim().length>0},
+    {id:'city',test:v=>v.trim().length>0},
+    {id:'state',test:v=>v!=''},
+    {id:'pin',test:v=>/^\d{6}$/.test(v)},
+  ];
+  let ok=true;
+  fields.forEach(f=>{
+    const el=document.getElementById(f.id);
+    const grp=el.closest('.form-group');
+    const pass=f.test(el.value);
+    grp.classList.toggle('error',!pass);
+    if(!pass)ok=false;
+  });
+  return ok;
+}
+
+/* ─── PLACE ORDER ─── */
+function placeOrder(){
+  if(!cart.length){alert('Your cart is empty!');return}
+  if(!validate())return;
+  const btn=document.getElementById('placeBtn');
+  btn.textContent='Processing…';btn.disabled=true;
+  setTimeout(()=>{
+    sessionStorage.removeItem('niramish_cart');
+    document.getElementById('checkoutLayout').style.display='none';
+    document.getElementById('successScreen').classList.add('show');
+    window.scrollTo({top:0,behavior:'smooth'});
+  },1800);
+}
+
+/* ─── INIT ─── */
+renderSummary();
+</script>
+</body>
+</html>
