@@ -518,8 +518,25 @@ function placeOrder(){
   btn.textContent='Opening WhatsApp…';btn.disabled=true;
 
   const waUrl = `https://wa.me/${ORDER_WA_NUMBER}?text=${encodeURIComponent(buildOrderMessage())}`;
-  window.open(waUrl,'_blank');
+  const waWindow = window.open(waUrl,'_blank');
   document.getElementById('reopenWa').href = waUrl;
+
+  /* When the customer comes back to this tab after sending the WhatsApp
+     message (switching back from the WhatsApp app/tab), pull this window
+     back into focus and make sure the confirmation screen — not wherever
+     they'd scrolled to — is what they land on. Browsers/phones don't allow
+     a background tab to force itself to the front while another app is
+     active, so the customer still has to switch back themselves; this just
+     makes sure Niramish is front-and-centre the moment they do. */
+  const backToNiramish = () => {
+    if(document.visibilityState==='visible'){
+      window.focus();
+      document.getElementById('successScreen').scrollIntoView({behavior:'smooth',block:'start'});
+    }
+  };
+  document.addEventListener('visibilitychange', backToNiramish);
+  window.addEventListener('focus', backToNiramish);
+  window.addEventListener('pageshow', backToNiramish);
 
   setTimeout(()=>{
     sessionStorage.removeItem('niramish_cart');
