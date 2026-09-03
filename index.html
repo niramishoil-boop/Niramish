@@ -140,6 +140,10 @@ button{cursor:pointer;font-family:inherit;border:none;background:none}
 .card-desc{font-size:.83rem;line-height:1.78;color:var(--bark);margin-bottom:16px;flex:1}
 .card-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
 .pill{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--mist);color:var(--forest);padding:4px 11px;border-radius:50px;background:var(--warm)}
+.size-pills{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+.size-pill{font-size:.72rem;letter-spacing:.04em;color:var(--forest);padding:7px 14px;border-radius:50px;background:var(--warm);border:1.5px solid var(--mist);transition:var(--transition)}
+.size-pill:hover{border-color:var(--gold)}
+.size-pill.active{background:var(--forest);color:var(--amber);border-color:var(--forest)}
 .card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid var(--mist);gap:12px}
 .card-price{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:600;color:var(--forest)}
 .card-price small{font-family:'DM Sans',sans-serif;font-size:.72rem;color:var(--bark);font-weight:300;margin-left:3px}
@@ -501,7 +505,12 @@ const PRODUCTS = [
   {
     id:'mustard-oil',name:'Mustard Oil',hindi:'सरसों का शुद्ध तेल',
     tag:'Wood Pressed · Kachi Ghani',badge:'Bestseller',
-    price:429,size:'1 Litre',
+    sizes:[
+      {key:'1l',label:'1 Litre',price:210},
+      {key:'2l',label:'2 Litre',price:400},
+      {key:'5l',label:'5 Litre',price:1000},
+      {key:'10l',label:'10 Litre',price:2000}
+    ],
     desc:'Cold-pressed from handpicked black mustard seeds, retaining every drop of bold aroma and natural nutrients. No heat, no hexane — just pure golden goodness.',
     pills:['Rich Aroma','High Smoke Point','Omega-3 Rich','No Additives'],
     img:'img/mustard1.jpg',imgBack:'img/mustard3.jpg'
@@ -539,14 +548,36 @@ function saveCart(){sessionStorage.setItem('niramish_cart',JSON.stringify(cart))
 
 function getCartItem(id){return cart.find(i=>i.id===id)}
 
+/* ─── SIZE SELECTION (for products with multiple pack sizes) ─── */
+let selectedSizes = {};
+
+function selectSize(id,key){
+  selectedSizes[id]=key;
+  const p = PRODUCTS.find(p=>p.id===id);
+  const s = p.sizes.find(sz=>sz.key===key);
+  const priceEl = document.getElementById(`price-${id}`);
+  if(priceEl)priceEl.innerHTML = `₹${s.price}<small>/ ${s.label}</small>`;
+  document.querySelectorAll(`.size-pill[data-pid="${id}"]`).forEach(btn=>{
+    btn.classList.toggle('active',btn.dataset.key===key);
+  });
+}
+
 function addToCart(id){
   const p = PRODUCTS.find(p=>p.id===id);
   if(!p)return;
-  const item = getCartItem(id);
-  if(item){item.qty++}else{cart.push({...p,qty:1})}
+  let cartItem;
+  if(p.sizes){
+    const key = selectedSizes[id] || p.sizes[0].key;
+    const s = p.sizes.find(sz=>sz.key===key);
+    cartItem = {id:`${id}__${key}`,name:p.name,size:s.label,price:s.price,img:p.img,qty:1};
+  }else{
+    cartItem = {id:p.id,name:p.name,size:p.size,price:p.price,img:p.img,qty:1};
+  }
+  const item = getCartItem(cartItem.id);
+  if(item){item.qty++}else{cart.push(cartItem)}
   saveCart();
   updateCartUI();
-  showToast(`${p.name} added to cart 🛒`);
+  showToast(`${cartItem.name} (${cartItem.size}) added to cart 🛒`);
   const btn = document.querySelector(`[data-id="${id}"]`);
   if(btn){btn.textContent='✓ Added';btn.classList.add('added');setTimeout(()=>{btn.textContent='Add to Cart';btn.classList.remove('added')},1600)}
 }
@@ -633,8 +664,17 @@ function showToast(msg){
 
 /* ─── RENDER PRODUCTS ─── */
 function renderProducts(){
+  PRODUCTS.forEach(p=>{ if(p.sizes && !selectedSizes[p.id]) selectedSizes[p.id]=p.sizes[0].key; });
   const grid = document.getElementById('productsGrid');
-  grid.innerHTML = PRODUCTS.map(p=>`
+  grid.innerHTML = PRODUCTS.map(p=>{
+    const activeSize = p.sizes ? p.sizes.find(s=>s.key===selectedSizes[p.id]) : null;
+    const displayPrice = p.sizes ? activeSize.price : p.price;
+    const displaySize = p.sizes ? activeSize.label : p.size;
+    const sizeBlock = p.sizes ? `
+        <div class="size-pills" role="group" aria-label="Select size for ${p.name}">
+          ${p.sizes.map(s=>`<button type="button" class="size-pill${s.key===selectedSizes[p.id]?' active':''}" data-pid="${p.id}" data-key="${s.key}" onclick="selectSize('${p.id}','${s.key}')">${s.label}</button>`).join('')}
+        </div>` : '';
+    return `
     <article class="product-card reveal" aria-label="${p.name}">
       <div class="card-badge">${p.badge}</div>
       <div class="card-img-wrap${p.imgBack?'':' single'}">
@@ -650,12 +690,14 @@ function renderProducts(){
         <p class="card-name-hi hi">${p.hindi}</p>
         <p class="card-desc">${p.desc}</p>
         <div class="card-pills">${p.pills.map(pl=>`<span class="pill">${pl}</span>`).join('')}</div>
+        ${sizeBlock}
         <div class="card-footer">
-          <div class="card-price en">₹${p.price}<small>/ ${p.size}</small></div>
+          <div class="card-price en" id="price-${p.id}">₹${displayPrice}<small>/ ${displaySize}</small></div>
           <button class="add-cart" data-id="${p.id}" onclick="addToCart('${p.id}')">Add to Cart</button>
         </div>
       </div>
-    </article>`).join('');
+    </article>`;
+  }).join('');
   observeReveal();
 }
 
