@@ -157,13 +157,13 @@ textarea{resize:vertical;min-height:72px}
 
 <!-- SUCCESS SCREEN (hidden until order placed) -->
 <div class="success-screen" id="successScreen">
-  <div class="success-icon">🎉</div>
-  <h1 class="success-title">Order Confirmed!</h1>
-  <p class="success-title-hi" style="font-family:'Noto Serif Devanagari',serif">आपका ऑर्डर मिल गया! धन्यवाद।</p>
+  <div class="success-icon">📲</div>
+  <h1 class="success-title">Almost Done — Confirm on WhatsApp!</h1>
+  <p class="success-title-hi" style="font-family:'Noto Serif Devanagari',serif">कृपया WhatsApp पर भेजें।</p>
   <p class="success-body">
-    Thank you for choosing Niramish. Your order has been placed and we'll dispatch it within 24–48 hours.<br/>
-    You'll receive a WhatsApp confirmation shortly on your registered number.<br/><br/>
-    Questions? <a href="https://wa.me/918376091208" target="_blank" rel="noopener">Chat with us on WhatsApp</a>
+    We've opened WhatsApp with all your order details already filled in.<br/>
+    Just hit <strong>Send</strong> there to confirm your order with us — we'll reply right away to confirm and arrange delivery within 24–48 hours.<br/><br/>
+    Didn't open automatically? <a href="#" id="reopenWa">Tap here to open WhatsApp</a>
   </p>
   <a href="index.html" style="display:inline-block;background:var(--forest);color:var(--amber);padding:14px 32px;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;border-radius:6px">← Continue Shopping</a>
 </div>
@@ -462,18 +462,71 @@ function validate(){
   return ok;
 }
 
+/* ─── WHATSAPP ORDER MESSAGE ─── */
+const ORDER_WA_NUMBER = '918376091208';
+
+function buildOrderMessage(){
+  const fname = document.getElementById('fname').value.trim();
+  const lname = document.getElementById('lname').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const addr1 = document.getElementById('addr1').value.trim();
+  const addr2 = document.getElementById('addr2').value.trim();
+  const city = document.getElementById('city').value.trim();
+  const state = document.getElementById('state').value;
+  const pin = document.getElementById('pin').value.trim();
+  const notes = document.getElementById('notes').value.trim();
+
+  const payNames = {upi:'UPI / QR Code',card:'Credit / Debit Card',net:'Net Banking',cod:'Cash on Delivery'};
+  let payLine = payNames[selectedPay] || selectedPay;
+  if(selectedPay==='upi'){
+    const txn = document.getElementById('upiTxn').value.trim();
+    if(txn) payLine += ` (Txn ID: ${txn})`;
+  }
+  /* Note: card/net-banking details are never included here — only the chosen
+     payment method is shared over WhatsApp, never card numbers or CVV. */
+
+  const sub = getSubtotal();
+  const delivery = sub >= 499 ? 0 : 49;
+  const codFee = selectedPay==='cod' ? 30 : 0;
+  const grand = sub - discount + delivery + codFee;
+
+  const itemLines = cart.map((i,idx)=>`${idx+1}. ${i.name} (${i.size}) x${i.qty} — ₹${i.price*i.qty}`).join('\n');
+  let addrLine = addr1 + (addr2 ? `, ${addr2}` : '');
+
+  let msg = `🛒 *New Order — Niramish*\n\n`;
+  msg += `*Customer:* ${fname} ${lname}\n`;
+  msg += `*Phone:* ${phone}\n`;
+  if(email) msg += `*Email:* ${email}\n`;
+  msg += `\n*Delivery Address:*\n${addrLine}\n${city}, ${state} - ${pin}\n`;
+  if(notes) msg += `*Instructions:* ${notes}\n`;
+  msg += `\n*Items:*\n${itemLines}\n`;
+  msg += `\nSubtotal: ₹${sub}`;
+  if(discount) msg += `\nDiscount: -₹${discount}`;
+  msg += `\nDelivery: ${delivery===0?'FREE':'₹'+delivery}`;
+  if(codFee) msg += `\nCOD Fee: ₹${codFee}`;
+  msg += `\n*Total: ₹${grand}*\n`;
+  msg += `\n*Payment Method:* ${payLine}`;
+  return msg;
+}
+
 /* ─── PLACE ORDER ─── */
 function placeOrder(){
   if(!cart.length){alert('Your cart is empty!');return}
   if(!validate())return;
   const btn=document.getElementById('placeBtn');
-  btn.textContent='Processing…';btn.disabled=true;
+  btn.textContent='Opening WhatsApp…';btn.disabled=true;
+
+  const waUrl = `https://wa.me/${ORDER_WA_NUMBER}?text=${encodeURIComponent(buildOrderMessage())}`;
+  window.open(waUrl,'_blank');
+  document.getElementById('reopenWa').href = waUrl;
+
   setTimeout(()=>{
     sessionStorage.removeItem('niramish_cart');
     document.getElementById('checkoutLayout').style.display='none';
     document.getElementById('successScreen').classList.add('show');
     window.scrollTo({top:0,behavior:'smooth'});
-  },1800);
+  },800);
 }
 
 /* ─── INIT ─── */
