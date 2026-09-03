@@ -628,13 +628,32 @@ function renderCartItems(){
 
 function saveCartAndGo(e){saveCart()}
 
+/* ─── SCROLL LOCK (shared by cart drawer + mobile menu, never conflicts) ─── */
+function setBodyLock(){
+  document.body.style.overflow=(cartOpen||menuOpen)?'hidden':'';
+}
+
+function closeAllOverlays(){
+  cartOpen=false;menuOpen=false;
+  document.getElementById('cartDrawer')?.classList.remove('open');
+  document.getElementById('cartOverlay')?.classList.remove('open');
+  document.getElementById('mobileMenu')?.classList.remove('open');
+  document.getElementById('hamburger')?.classList.remove('open');
+  setBodyLock();
+}
+
 /* ─── CART DRAWER ─── */
 let cartOpen=false;
 function toggleCart(){
   cartOpen=!cartOpen;
+  if(cartOpen && menuOpen){
+    menuOpen=false;
+    document.getElementById('mobileMenu').classList.remove('open');
+    document.getElementById('hamburger').classList.remove('open');
+  }
   document.getElementById('cartDrawer').classList.toggle('open',cartOpen);
   document.getElementById('cartOverlay').classList.toggle('open',cartOpen);
-  document.body.style.overflow=cartOpen?'hidden':'';
+  setBodyLock();
   if(cartOpen)renderCartItems();
 }
 
@@ -642,10 +661,21 @@ function toggleCart(){
 let menuOpen=false;
 function toggleMenu(){
   menuOpen=!menuOpen;
+  if(menuOpen && cartOpen){
+    cartOpen=false;
+    document.getElementById('cartDrawer').classList.remove('open');
+    document.getElementById('cartOverlay').classList.remove('open');
+  }
   document.getElementById('mobileMenu').classList.toggle('open',menuOpen);
   document.getElementById('hamburger').classList.toggle('open',menuOpen);
-  document.body.style.overflow=menuOpen?'hidden':'';
+  setBodyLock();
 }
+
+/* Defensive reset: if the browser restores this page from cache (e.g. the
+   customer taps the back button after checkout) with the cart drawer or
+   menu mid-open, force everything closed and scroll unlocked rather than
+   leaving the page stuck unresponsive to touch/scroll. */
+window.addEventListener('pageshow',closeAllOverlays);
 
 /* ─── FAQ ─── */
 function toggleFaq(el){
